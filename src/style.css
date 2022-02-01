@@ -1,0 +1,49 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    /* overflow: hidden; */
+    background-color: #E9E9E9;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+    z-index:1;
+}
+
+
+.portfolio{
+    width:100%;
+    background-image:url('./framer.png') ;
+    background-size: cover;
+    z-index:998;
+}
+
+.link{
+    width: 100vw;
+    background-color: white;
+    margin:0 auto;
+    position: absolute;
+}
+
+
+.section{
+    width:100vw;
+    height:1400px;
+}
+
+.section-2{
+    position: absolute;
+    width:100vw;
+    height:900px;
+    z-index:999;
+}
