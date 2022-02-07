@@ -7,6 +7,27 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import gsap from 'gsap'
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+
+
+// follow kursor
+var box = document.getElementById("hover")
+var att = window.getComputedStyle(document.querySelector('#hover')).display
+console.log(att)
+if (att == 'block'){
+console.log(att)
+window.addEventListener('mousemove', function(e){
+    var left = e.pageX + "px";
+    var top = e.pageY + "px";
+
+    box.style.left = left;
+    box.style.top = top;
+
+});
+}
+else{console.log('test2')}
+
+
+const element = document.querySelector('.webgl')
 /**
  * Loaders
  */
@@ -22,7 +43,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
     
         // Progress
         () =>
-        {
+        {   
+            
             console.log('progress')
         }
     
@@ -130,7 +152,7 @@ let animCloseAction = null
 let animStandingAction = null
 let model1 = '/models/idle.gltf'
 let model2 = '/models/idle.gltf'
-
+let animation = {}
 
 
 
@@ -157,15 +179,19 @@ gltfLoader.load(
 
               
         Animation
-        mainMixer = new THREE.AnimationMixer( gltf.scene )
-        animOpenAction = mainMixer.clipAction( gltf.animations[0] )
-        animCloseAction = mainMixer.clipAction( gltf.animations[1] )
-        animStandingAction = mainMixer.clipAction( gltf.animations[2] )
+        animation.actions = {}
 
-        animCloseAction.play()
+        animation.mainMixer = new THREE.AnimationMixer( gltf.scene )
+        animation.actions.animOpenAction = animation.mainMixer.clipAction( gltf.animations[0] )
+        animation.actions.animCloseAction = animation.mainMixer.clipAction( gltf.animations[1] )
+        animation.actions.animStandingAction = animation.mainMixer.clipAction( gltf.animations[2] )
+
+        animation.actions.current = animation.actions.animOpenAction
+        animation.actions.current.play()
 
     }
 )
+console.log(animation)
 
 /**
  * Floor
@@ -241,39 +267,52 @@ scene.add(camera)
  */
 const renderer = new THREE.WebGLRenderer({
 canvas: canvas,
-alpha:false
 })
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.setClearColor( 0xf00f00, 1)
 
 
 
 
 /**
- * Window Listener
- */
-
-
-function playModifierAnimation(from, fSpeed, to, tSpeed) {
-    // to.setLoop(THREE.LoopOnce);
-    // to.reset()
-    to.play()
-    from.crossFadeTo(to, fSpeed, true)
-    setTimeout(function() {
-      from.enabled = true;
-      to.crossFadeTo(from, tSpeed, true)
-      currentlyAnimating = false
-    }, to._clip.duration * 1000 - ((tSpeed + fSpeed) * 1000))
-  }
+ * Change animation
+ *  */
 
 
   
 function changeAnimation(){
-
+    // Fly to land
     console.log('test')
-    animCloseAction.play()  
+    animation.play = (name) =>{
+        const newAction = animation.actions[name]
+        const oldAction = animation.actions.current
+    
+        newAction.reset()
+        newAction.play()
+        newAction.crossFadeFrom(oldAction, 0.1)
+        animation.actions.current = newAction
+
+    }  
+    animation.play('animCloseAction')
+
+    // Land to idle
+    animation.play = (name) =>{
+        const newAction = animation.actions[name]
+        const oldAction = animation.actions.current
+    
+        newAction.reset()
+        newAction.play()
+        newAction.crossFadeFrom(oldAction, 1)
+        animation.actions.current = newAction
+        element.classList.add('done')
+
+    }  
+    animation.play('animStandingAction')
+    
+    
 
  }
 
@@ -350,9 +389,9 @@ const tick = () =>
     // Model animation
 
 
-    if(mainMixer)
+    if(animation.mainMixer)
     {
-        mainMixer.update(deltaTime)
+        animation.mainMixer.update(deltaTime)
     }
 
 
