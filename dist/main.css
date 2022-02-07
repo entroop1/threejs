@@ -20,6 +20,21 @@ body
     z-index:1;
 }
 
+.done
+{
+    position: relative;
+    top: 0;
+    left: 0;
+    outline: none;
+    z-index:1;
+}
+
+#hover{
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-color: blue;
+}
 
 .portfolio{
     width:100%;
